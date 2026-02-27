@@ -1,0 +1,27 @@
+# Environment variables (Sensitive information)
+.env
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Local Database / Data
+db.csv
+
+# IDE Settings
+.vscode/
+.idea/
+
+# OS Specific
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

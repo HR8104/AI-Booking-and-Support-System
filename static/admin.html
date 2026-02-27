@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bella Vista Bistro - Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .stat-card h2 {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+        .stat-card p {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+        .bookings-table-wrapper {
+            margin-top: 2rem;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: var(--text-light);
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        th {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--accent);
+            font-weight: 600;
+        }
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+        .status-confirmed { background: var(--secondary); color: white; }
+        .status-cancelled { background: var(--primary); color: white; }
+        .status-rescheduled { background: var(--accent); color: black; }
+        
+        .nav-links {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 15px;
+        }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-overlay"></div>
+    
+    <div class="admin-container">
+        <header>
+            <div class="logo">
+                <span class="italian-flag"></span>
+                <h1>Admin <span>Dashboard</span></h1>
+            </div>
+            <div class="nav-links">
+                <a href="/">&larr; Back to Booking Page</a>
+                <a href="#" onclick="fetchBookings()">Refresh Data</a>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card glass">
+                <h2 id="total-bookings">0</h2>
+                <p>Total Bookings</p>
+            </div>
+            <div class="stat-card glass">
+                <h2 id="total-guests">0</h2>
+                <p>Total Guests</p>
+            </div>
+            <div class="stat-card glass">
+                <h2 id="confirmed-bookings">0</h2>
+                <p>Confirmed</p>
+            </div>
+            <div class="stat-card glass">
+                <h2 id="cancelled-bookings">0</h2>
+                <p>Cancelled</p>
+            </div>
+        </div>
+
+        <div class="bookings-table-wrapper glass">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer</th>
+                        <th>Email</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Guests</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="bookings-body">
+                    <!-- Rows injected here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function fetchBookings() {
+            try {
+                const response = await fetch('/api/admin/bookings');
+                const data = await response.json();
+                renderDashboard(data);
+            } catch (error) {
+                console.error('Error fetching bookings:', error);
+            }
+        }
+
+        function renderDashboard(bookings) {
+            const body = document.getElementById('bookings-body');
+            body.innerHTML = '';
+            
+            let totalGuests = 0;
+            let confirmed = 0;
+            let cancelled = 0;
+
+            bookings.reverse().forEach(b => {
+                const row = document.createElement('tr');
+                
+                if (b.status === 'confirmed') confirmed++;
+                else if (b.status === 'cancelled') cancelled++;
+                
+                if (b.status !== 'cancelled') {
+                    totalGuests += parseInt(b.party_size);
+                }
+
+                row.innerHTML = `
+                    <td style="font-family: monospace; font-size: 0.8rem;">${b.booking_id}</td>
+                    <td>${b.name}</td>
+                    <td style="font-size: 0.85rem; color: var(--text-muted);">${b.email}</td>
+                    <td>${b.date}</td>
+                    <td>${b.time}</td>
+                    <td>${b.party_size}</td>
+                    <td><span class="status-badge status-${b.status}">${b.status}</span></td>
+                `;
+                body.appendChild(row);
+            });
+
+            document.getElementById('total-bookings').textContent = bookings.length;
+            document.getElementById('total-guests').textContent = totalGuests;
+            document.getElementById('confirmed-bookings').textContent = confirmed;
+            document.getElementById('cancelled-bookings').textContent = cancelled;
+        }
+
+        // Initial load
+        fetchBookings();
+    </script>
+</body>
+</html>

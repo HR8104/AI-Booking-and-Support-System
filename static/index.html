@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bella Vista Bistro - AI Assistant</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Modal for Quick Action Details -->
+    <div id="modal-overlay" class="modal-overlay">
+      <div class="modal-content glass">
+        <button id="close-modal" class="close-btn">&times;</button>
+        <div id="modal-body">
+          <!-- Content injected via JS -->
+        </div>
+      </div>
+    </div>
+
+    <div class="app-container">
+      <!-- Hero Section Background -->
+      <div class="bg-overlay"></div>
+
+      <header>
+        <div class="logo">
+          <span class="italian-flag"></span>
+          <h1>Bella Vista <span>Bistro</span></h1>
+        </div>
+        <p class="subtitle">
+          Experience authentic Italian-Mediterranean cuisine
+        </p>
+      </header>
+
+      <main class="chat-wrapper">
+        <div class="chat-container glass">
+          <div class="chat-header">
+            <div class="agent-info">
+              <div class="status-dot"></div>
+              <div>
+                <h3>Bistro Assistant</h3>
+                <p>Online | Ready to help</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="chat-messages" class="chat-messages">
+            <div class="message assistant">
+              <div class="message-content">
+                Ciao! Benvenuti to Bella Vista Bistro. I can help you with menu
+                inquiries, bookings, or any questions about your visit. How can
+                I assist you today?
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-input-area">
+            <form id="chat-form">
+              <input
+                type="text"
+                id="user-input"
+                placeholder="Type your message here..."
+                autocomplete="off"
+              />
+              <button type="submit" id="send-btn">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M22 2L11 13M22 2L15 22L11 13M11 13L2 9L22 2"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="quick-info glass">
+          <h3>Highlights</h3>
+          <div class="quick-actions">
+            <button class="action-btn" data-msg="I have an inquiry about the menu and services.">
+              <span class="btn-icon">📋</span>
+              <span>Inquiry</span>
+            </button>
+            <button class="action-btn" data-msg="I need support with my order or have a complaint.">
+              <span class="btn-icon">⚙️</span>
+              <span>Support</span>
+            </button>
+            <button class="action-btn" data-msg="I would like to book a table. Can you guide me?">
+              <span class="btn-icon">📅</span>
+              <span>Bookings</span>
+            </button>
+          </div>
+          
+          <div class="divider"></div>
+
+          <div class="info-item">
+            <span class="icon">📍</span>
+            <p>123 Sunset Boulevard, LA</p>
+          </div>
+          <div class="info-item">
+            <span class="icon">⏰</span>
+            <p>Open Today: 11AM - 10PM</p>
+          </div>
+        </div>
+      </main>
+
+      <footer>&copy; 2026 Bella Vista Bistro. All rights reserved.</footer>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
