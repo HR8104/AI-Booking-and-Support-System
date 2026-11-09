@@ -4,10 +4,35 @@ document.addEventListener("DOMContentLoaded", () => {
   const chatMessages = document.getElementById("chat-messages");
   let sessionId = localStorage.getItem("bistro_session_id");
 
-  // Show session ID in the header if it exists
-  if (sessionId) {
-    const statusText = document.querySelector(".agent-info p");
-    if (statusText) statusText.textContent = `Online | ID: ${sessionId}`;
+  // Minimal, safe markdown -> HTML for assistant replies (escape first, then format).
+  function escapeHtml(text) {
+    return text.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  function inlineMarkdown(text) {
+    return text
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/`([^`]+)`/g, "<code>$1</code>");
+  }
+
+  function renderMarkdown(raw) {
+    const lines = escapeHtml(raw).split(/\r?\n/);
+    let html = "";
+    let inList = false;
+    for (const line of lines) {
+      const item = line.match(/^\s*(?:[-*•]|\d+\.)\s+(.*)$/);
+      const heading = line.match(/^\s*#{1,6}\s+(.*)$/);
+      if (item) {
+        if (!inList) { html += "<ul>"; inList = true; }
+        html += `<li>${inlineMarkdown(item[1])}</li>`;
+        continue;
+      }
+      if (inList) { html += "</ul>"; inList = false; }
+      if (heading) html += `<p class="md-heading"><strong>${inlineMarkdown(heading[1])}</strong></p>`;
+      else if (line.trim()) html += `<p>${inlineMarkdown(line)}</p>`;
+    }
+    if (inList) html += "</ul>";
+    return html;
   }
 
   // Function to append a message to the chat
@@ -17,7 +42,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const messageContent = document.createElement("div");
     messageContent.classList.add("message-content");
-    messageContent.textContent = content;
+    if (role === "assistant") {
+      messageContent.classList.add("markdown");
+      messageContent.innerHTML = renderMarkdown(content);
+    } else {
+      messageContent.textContent = content;
+    }
 
     messageDiv.appendChild(messageContent);
     chatMessages.appendChild(messageDiv);
@@ -76,9 +106,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (data.session_id) {
           sessionId = data.session_id;
           localStorage.setItem("bistro_session_id", sessionId);
-          // Show session ID in the header
-          const statusText = document.querySelector('.agent-info p');
-          statusText.textContent = `Online | ID: ${sessionId}`;
         }
       } else if (data.error) {
         appendMessage(

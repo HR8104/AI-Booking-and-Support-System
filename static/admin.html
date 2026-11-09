@@ -110,7 +110,7 @@
             </div>
             <div class="stat-card glass">
                 <h2 id="confirmed-bookings">0</h2>
-                <p>Confirmed</p>
+                <p>Active</p>
             </div>
             <div class="stat-card glass">
                 <h2 id="cancelled-bookings">0</h2>
@@ -149,6 +149,10 @@
             }
         }
 
+        function esc(value) {
+            return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+
         function renderDashboard(bookings) {
             const body = document.getElementById('bookings-body');
             body.innerHTML = '';
@@ -160,21 +164,22 @@
             bookings.reverse().forEach(b => {
                 const row = document.createElement('tr');
                 
-                if (b.status === 'confirmed') confirmed++;
-                else if (b.status === 'cancelled') cancelled++;
-                
+                if (b.status === 'cancelled') cancelled++;
+                else confirmed++;  // confirmed + rescheduled are both active bookings
+
                 if (b.status !== 'cancelled') {
-                    totalGuests += parseInt(b.party_size);
+                    totalGuests += parseInt(b.party_size) || 0;
                 }
+                const status = ['confirmed', 'cancelled', 'rescheduled'].includes(b.status) ? b.status : 'confirmed';
 
                 row.innerHTML = `
-                    <td style="font-family: monospace; font-size: 0.8rem;">${b.booking_id}</td>
-                    <td>${b.name}</td>
-                    <td style="font-size: 0.85rem; color: var(--text-muted);">${b.email}</td>
-                    <td>${b.date}</td>
-                    <td>${b.time}</td>
-                    <td>${b.party_size}</td>
-                    <td><span class="status-badge status-${b.status}">${b.status}</span></td>
+                    <td style="font-family: monospace; font-size: 0.8rem;">${esc(b.booking_id)}</td>
+                    <td>${esc(b.name)}</td>
+                    <td style="font-size: 0.85rem; color: var(--text-muted);">${esc(b.email)}</td>
+                    <td>${esc(b.date)}</td>
+                    <td>${esc(b.time)}</td>
+                    <td>${esc(b.party_size)}</td>
+                    <td><span class="status-badge status-${status}">${esc(b.status)}</span></td>
                 `;
                 body.appendChild(row);
             });
